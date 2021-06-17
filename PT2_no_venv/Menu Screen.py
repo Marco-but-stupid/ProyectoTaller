@@ -9,7 +9,7 @@ MenuScreen = pygame.display.set_mode((1200, 650))
 
 #Título e ícono
 pygame.display.set_caption("Battle At Phobos")
-ícono = pygame.image.load(r"C:\Users\josec\Downloads\Proyecto\Marte.png")
+ícono = pygame.image.load("Marte.png")
 pygame.display.set_icon(ícono)
 
 
