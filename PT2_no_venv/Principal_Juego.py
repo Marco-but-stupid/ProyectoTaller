@@ -1,5 +1,6 @@
 import pygame
 import random
+import math
 
 #se inicializa pygame
 pygame.init()
@@ -22,26 +23,33 @@ jugadorX = 465
 jugadorY = 465
 jugadorX_cambio = 0
 jugadorY_cambio = 0
+jugador_vida = 20
 
-#Asteroide(s)
-asteroideImg = pygame.image.load("test_asteroid.png")
-asteroideX = random.randint(0,950)
-asteroideY = random.randint(0,399)
-asteroideX_cambio = random.randint(-8, 8)
-asteroideY_cambio = random.randint(-8, 8)
+#Proyectil(s)
+proyectilImg = pygame.image.load("test_asteroid.png")
+proyectilX = random.randint(0,929)
+proyectilY = random.randint(0,399)
+proyectilX_cambio = random.randint(-15, 15)
+proyectilY_cambio = random.randint(-15, 15)
+
 
 #función del jugador
 def jugador(x,y):
     screen.blit(jugadorImg,(x,y))  #blit es la función que "dibuja" al jugador en la pantalla
 
 #función de los asteroides
-def asteroide(x,y):
-    screen.blit(asteroideImg,(x,y))
+def proyectil(x,y):
+    screen.blit(proyectilImg,(x,y))
 
 #función que detecta colisónes
-def colision(jugadorX, jugadorY, asteroideX, asteroideY):
+def icolision(jugadorX, jugadorY, proyectilX, proyectilY):
+    distancia = math.sqrt(math.pow(proyectilX - jugadorX, 2) + math.pow(proyectilY - jugadorY, 2))
+    if distancia < 60:
+        return True
+    else:
+        return False
 
-#se crea el loop del juego
+#loop del juego
 corriendo = True
 while corriendo:
     for evento in pygame.event.get():
@@ -66,18 +74,18 @@ while corriendo:
     screen.fill((150,150,150))   #Color de fondo
     screen.blit(fondo, (0,0))
 
-    asteroideX += asteroideX_cambio
-    asteroideY += asteroideY_cambio
-    if asteroideX <= -10:
-        asteroideX_cambio = -asteroideX_cambio
-    if asteroideX >= 930:
-        asteroideX_cambio = -asteroideX_cambio
-    if asteroideY <= -10:
-        asteroideY_cambio = -asteroideY_cambio
-    if asteroideY >= 600:
-        asteroideY_cambio = -asteroideY_cambio
+    proyectilX += proyectilX_cambio
+    proyectilY += proyectilY_cambio
+    if proyectilX <= -10:
+        proyectilX_cambio = -proyectilX_cambio
+    if proyectilX >= 930:
+        proyectilX_cambio = -proyectilX_cambio
+    if proyectilY <= -10:
+        proyectilY_cambio = -proyectilY_cambio
+    if proyectilY >= 600:
+        proyectilY_cambio = -proyectilY_cambio
 
-    asteroide(asteroideX, asteroideY)
+    proyectil(proyectilX, proyectilY)
 
     jugadorX += jugadorX_cambio
     jugadorY += jugadorY_cambio
@@ -89,6 +97,15 @@ while corriendo:
         jugadorY = 10
     elif jugadorY >= 570:
         jugadorY = 570
+
+    colision = icolision(jugadorX, jugadorY, proyectilX, proyectilY)
+    if colision:
+        jugador_vida -= 1
+        print(jugador_vida)
+        proyectilX = random.randint(0, 950)
+        proyectilY = random.randint(0, 399)
+        proyectilX_cambio = random.randint(-15, 15)
+        proyectilY_cambio = random.randint(-15, 15)
 
     jugador(jugadorX,jugadorY)
 
