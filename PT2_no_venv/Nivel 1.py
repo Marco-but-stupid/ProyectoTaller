@@ -60,6 +60,9 @@ def main():
 
     jugador_velocidad = 7.5   #velocidad de la nave
 
+    proyectil_velocidad_x = random.randint(-8, 8)
+    proyectil_velocidad_y = random. randint(1, 8)
+
     jugador = Jugador(450, 557)
     proyectil = Proyectil(460, 15)
 
@@ -94,6 +97,18 @@ def main():
             jugador.y -= jugador_velocidad
         if teclas[pygame.K_DOWN] and jugador.y + jugador_velocidad + 100 < ALTO:  #mueve la nave hacia abajo
             jugador.y += jugador_velocidad
+
+        proyectil.x += proyectil_velocidad_x
+        proyectil.y += proyectil_velocidad_y
+
+        if proyectil.x <= 0:
+            proyectil_velocidad_x = -proyectil_velocidad_x
+        elif proyectil.x >= 950:
+            proyectil_velocidad_x = -proyectil_velocidad_x
+        elif proyectil.y <= -10:
+            proyectil_velocidad_y = -proyectil_velocidad_y
+        elif proyectil.y >= 600:
+            proyectil_velocidad_y = -proyectil_velocidad_y
 
         redibujar_ventana()
 
