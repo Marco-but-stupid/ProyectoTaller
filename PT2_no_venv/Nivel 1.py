@@ -1,7 +1,9 @@
 import pygame
+import math
 import os
 import time
 import random
+
 pygame.font.init() #inicializa las fuentes de texto en pygame
 
 #Se crea la pantalla
@@ -24,12 +26,17 @@ class Objeto:
         self.vida = vida
         self.objeto_img = None
 
-    #dibuja la nave sobre la ventana
     #e: self, donde se debe dibujar la nave
     #s: la nave dibujada
-    #r:
+    #r: -
     def dibujar(self, ventana):
         VEN.blit(self.objeto_img, (self.x, self.y))
+
+    #e: self, donde se debe borrar el objeto
+    #s: borra algún objeto de la ventana
+    #r: -
+    def borrar(self, ventana):
+        VEN.blit(self.objeto_img, (999999, 999999))
 
 class Jugador(Objeto):
     def __init__(self, x, y, vida=100):
@@ -40,54 +47,90 @@ class Jugador(Objeto):
 
 class Proyectil(Objeto):
     def __init__(self, x, y, vida=2):
-        super().__init__(x, y, vida)
+        super().__init__(x, y, vida)    #permite heredar de la clase NAVE
         self.objeto_img = PROYECTIL
         self.mask = pygame.mask.from_surface(self.objeto_img)
 
-    def movimiento(self, velx, vely):
+    def movimiento(self, velx, vely):   #movimiento del proyectil
         self.x += velx
         self.y += vely
 
-def main():
-    CORRER = True
-    FPS = 60  #veces por segundo que se corre el loop
-    NIVEL = 0
-    VIDA = 60
-    FUENTE = pygame.font.SysFont("comicsans", 55)
+def main():     #función principal del juego
 
-    velx = random.randint(-8, 8)
-    vely = random.randint(1, 8)
+    jugador = Jugador(450, 557)
+
+    CORRER = True
+    FPS = 60    #veces por segundo que se corre el loop
+    NIVEL = 0   #varible que permite cambiar de niveles
+    VIDA = 60   #vida total del jugador, cada "vida" tiene 20 puntos
+
+    # las fuente a utilizarse en el juego
+    FUENTE_PRINCIPAL = pygame.font.SysFont("comicsans", 50)
+    FUENTE_PERDER = pygame.font.SysFont("comicsans", 200)
+
+    proyectiles = []    #lista con los proyectiles del nivel
+    largo_nivel = 0     #cantidad de proyectiles en cada nivel
+
+    velx = random.randint(-11, 11)  #velocidad horizontal del proyectil
+    vely = random.randint(1, 11)    #velocidad horizontal del proyectil
 
     jugador_velocidad = 7.5   #velocidad de la nave
 
+    #velocidades verticales y horizontales del proyectil
     proyectil_velocidad_x = random.randint(-8, 8)
-    proyectil_velocidad_y = random. randint(1, 8)
+    proyectil_velocidad_y = random.randint(1, 8)
 
-    jugador = Jugador(450, 557)
-    proyectil = Proyectil(460, 15)
+    RELOJ = pygame.time.Clock() #mide el tiempo del juego
 
-    RELOJ = pygame.time.Clock()
+    perder = False
+    perder_contador = 0
 
-    def redibujar_ventana():
+    def redibujar_ventana():    #función que actualiza la ventana en cada loop
         VEN.blit(BG, (0,0))
-        VIDA_label = FUENTE.render(f"Vida: {VIDA}",1 , (0, 0, 0))
-        NIVEL_label = FUENTE.render(f"Nivel: {NIVEL}", 1, (0, 0, 0))
-
+        VIDA_label = FUENTE_PRINCIPAL.render(f"Vida: {VIDA}",1 , (0, 0, 0))
+        NIVEL_label = FUENTE_PRINCIPAL.render(f"Nivel: {NIVEL}", 1, (0, 0, 0))
         VEN.blit(VIDA_label, (50, 610))
         VEN.blit(NIVEL_label, (800, 610))
 
-        proyectil.dibujar(VEN)
-        jugador.dibujar(VEN)
+        for proyectil in proyectiles:   #dibuja los proyectiles sobre la ventana
+            proyectil.dibujar(VEN)
 
-        pygame.display.update() #actualiza la pantalla del juego
+        jugador.dibujar(VEN)            #dibuja la nave sobre la ventana
 
+        if perder:
+            perder_label = FUENTE_PERDER.render("GAME OVER", 1, (255, 0, 0))
+            VEN.blit(perder_label, (73, 250))
+
+        pygame.display.update()         #actualiza la pantalla del juego
+
+    #loop del juego
     while CORRER:
         RELOJ.tick(FPS)
+
+        redibujar_ventana()
+
+        if VIDA < 1:
+            perder = True
+            perder_contador += 1
+
+        if perder_contador > FPS * 5:
+            CORRER = False
+        else:
+            continue
+
+        if len(proyectiles) == 0:
+            NIVEL += 1
+            largo_nivel += 1
+            for i in range(largo_nivel):
+                proyectil = Proyectil(random.randint(100, 900), random.randint(10, 30))
+                proyectiles.append(proyectil)
+
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 CORRER = False
 
+        #permite el movimiento del jugador
         teclas = pygame.key.get_pressed()
         if teclas[pygame.K_LEFT] and jugador.x - jugador_velocidad > 0:   #mueve la nave a la izquierda
             jugador.x -= jugador_velocidad
@@ -98,18 +141,23 @@ def main():
         if teclas[pygame.K_DOWN] and jugador.y + jugador_velocidad + 100 < ALTO:  #mueve la nave hacia abajo
             jugador.y += jugador_velocidad
 
-        proyectil.x += proyectil_velocidad_x
-        proyectil.y += proyectil_velocidad_y
+        #permite el movimiento de los proyectiles
+        for proyectil in proyectiles:
 
-        if proyectil.x <= 0:
-            proyectil_velocidad_x = -proyectil_velocidad_x
-        elif proyectil.x >= 950:
-            proyectil_velocidad_x = -proyectil_velocidad_x
-        elif proyectil.y <= -10:
-            proyectil_velocidad_y = -proyectil_velocidad_y
-        elif proyectil.y >= 600:
-            proyectil_velocidad_y = -proyectil_velocidad_y
+            proyectil.x += proyectil_velocidad_x
+            proyectil.y += proyectil_velocidad_y
 
-        redibujar_ventana()
+            if proyectil.x <= 0:
+                proyectil_velocidad_x = -proyectil_velocidad_x
+            elif proyectil.x >= 950:
+                proyectil_velocidad_x = -proyectil_velocidad_x
+            elif proyectil.y <= -10:
+                proyectil_velocidad_y = -proyectil_velocidad_y
+            elif proyectil.y >= 600:
+                proyectil_velocidad_y = -proyectil_velocidad_y
+
+        if math.sqrt(math.pow(proyectil.x - jugador.x, 2) + math.pow(proyectil.y - jugador.y, 2)) < 75:
+            VIDA -= 1
+            proyectiles.remove(proyectil)
 
 main()
