@@ -82,8 +82,8 @@ def main():     #función principal del juego
 
     RELOJ = pygame.time.Clock() #mide el tiempo del juego
 
-    perder = False
-    perder_contador = 0
+    terminar = False
+    terminar_contador = 0
 
     def redibujar_ventana():    #función que actualiza la ventana en cada loop
         VEN.blit(BG, (0,0))
@@ -97,9 +97,9 @@ def main():     #función principal del juego
 
         jugador.dibujar(VEN)            #dibuja la nave sobre la ventana
 
-        if perder:
-            perder_label = FUENTE_PERDER.render("GAME OVER", 1, (255, 0, 0))
-            VEN.blit(perder_label, (73, 250))
+        if terminar:
+            terminar_label = FUENTE_PERDER.render("GAME OVER", 1, (255, 0, 0))
+            VEN.blit(terminar_label, (73, 250))
 
         pygame.display.update()         #actualiza la pantalla del juego
 
@@ -109,14 +109,14 @@ def main():     #función principal del juego
 
         redibujar_ventana()
 
-        if VIDA < 1:
-            perder = True
-            perder_contador += 1
-
-        if perder_contador > FPS * 5:
-            CORRER = False
-        else:
-            continue
+        if VIDA < 1 or NIVEL > 3:
+            terminar = True
+            terminar_contador += 1
+        if terminar:
+            if terminar_contador > 240:
+                CORRER = False
+            else:
+                continue
 
         if len(proyectiles) == 0:
             NIVEL += 1
