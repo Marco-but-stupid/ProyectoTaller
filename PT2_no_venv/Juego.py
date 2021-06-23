@@ -186,5 +186,7 @@ def main():     #función principal del juego
         if math.sqrt(math.pow(proyectil.x - jugador.x, 2) + math.pow(proyectil.y - jugador.y, 2)) < 75:
             VIDA -= 1
             proyectiles.remove(proyectil)
+            Sonido_Colisión = pygame.mixer.Sound("Asteroid_Explosion.wav")  # Agrega música al juego
+            Sonido_Colisión.play()  # Inicia el sonido
 
 main()
