@@ -95,6 +95,7 @@ def main():     #función principal del juego
         VEN.blit(BG, (0,0))
         Time = pygame.time.get_ticks() / 1000
         Contador = 0
+        Score = 0
 
         VIDA_label = FUENTE_PRINCIPAL.render(f"Vida: {VIDA}",1 , (0, 0, 0))
         NIVEL_label = FUENTE_PRINCIPAL.render(f"Nivel: {NIVEL}", 1, (0, 0, 0))
@@ -103,11 +104,16 @@ def main():     #función principal del juego
         VEN.blit(NIVEL_label, (800, 610))
 
 
-        if Contador == Time:
+        if Contador or Score == Time:
             Contador += 1
+            Score += 1
             print(Time)
+            
         ContadorTiempo_label = FUENTE_PRINCIPAL.render(("Tiempo: " + str(Time)), 1, (0,0,0))
         VEN.blit(ContadorTiempo_label, (500, 610))
+        
+        Puntaje_label = FUENTE_PRINCIPAL.render(("Puntaje: " + str(Time)), 1, (0,0,0))
+        VEN.blit(Puntaje_label, (200, 610))
 
 
         for proyectil in proyectiles:   #dibuja los proyectiles sobre la ventana
