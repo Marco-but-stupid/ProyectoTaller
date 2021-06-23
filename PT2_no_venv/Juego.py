@@ -18,6 +18,12 @@ PROYECTIL = pygame.image.load("test_asteroid.png")
 #Fondo
 BG = pygame.image.load("Fondo.png")
 
+#Sonido de fondo
+pygame.mixer.init()  # Inicializa mixer
+pygame.mixer.music.load("Background.mp3")  # Agrega música al juego
+pygame.mixer.music.play(-1)  # Inicia la música al juego y "-1" lo vuelve a repetir en bucle
+
+
 #Clase nave
 class Objeto:
     def __init__(self, x, y, vida=60):
@@ -87,22 +93,37 @@ def main():     #función principal del juego
 
     def redibujar_ventana():    #función que actualiza la ventana en cada loop
         VEN.blit(BG, (0,0))
+        Time = pygame.time.get_ticks() / 1000
+        Contador = 0
+
         VIDA_label = FUENTE_PRINCIPAL.render(f"Vida: {VIDA}",1 , (0, 0, 0))
         NIVEL_label = FUENTE_PRINCIPAL.render(f"Nivel: {NIVEL}", 1, (0, 0, 0))
+
         VEN.blit(VIDA_label, (50, 610))
         VEN.blit(NIVEL_label, (800, 610))
+
+
+        if Contador == Time:
+            Contador += 1
+            print(Time)
+        ContadorTiempo_label = FUENTE_PRINCIPAL.render(("Tiempo: " + str(Time)), 1, (0,0,0))
+        VEN.blit(ContadorTiempo_label, (500, 610))
+
 
         for proyectil in proyectiles:   #dibuja los proyectiles sobre la ventana
             proyectil.dibujar(VEN)
 
         jugador.dibujar(VEN)            #dibuja la nave sobre la ventana
 
+
         if terminar:
             terminar_label = FUENTE_PERDER.render("GAME OVER", 1, (255, 0, 0))
             VEN.blit(terminar_label, (73, 250))
 
-        pygame.display.update()         #actualiza la pantalla del juego
 
+
+        pygame.display.update()         #actualiza la pantalla del juego
+        
     #loop del juego
     while CORRER:
         RELOJ.tick(FPS)
